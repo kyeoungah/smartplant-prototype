@@ -1,0 +1,57 @@
+
+#include <Wire.h>
+#include <hd44780.h>
+#include <hd44780ioClass/hd44780_I2Cexp.h>
+#include <Adafruit_NeoPixel.h>
+
+//LCD 객체 
+hd44780_I2Cexp lcd;
+
+//네오픽셀
+int n_led = 24;
+int neo_pin = 4;
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(n_led, neo_pin, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+  strip.begin();
+  strip.show();
+  //LCD 통신 사용
+  lcd.begin(16,2);
+
+}
+
+void loop() {
+  //map()함수를 이용하여 토양수분센서 값 0~1023을 100~0의 값으로 표현
+  int humidity = map(analogRead(A0), 0, 1023, 100, 0);
+
+  //LCD에 수분량 출력
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("humidity : ");
+  lcd.print(humidity);
+  lcd.print("%");
+
+  //토양의 수분량에 따라서 LED 및 LCD 문구 변경
+  lcd.setCursor(0, 1);
+  if(humidity >= 75){
+    lcd.print("Too Much!");
+  }
+  else{
+    if(humidity <= 40){
+    lcd.print("Give Me Water!");
+    }
+    else lcd.print("I'm OK!");
+  }
+
+  delay(1000);
+
+    for(int i=1; i<24; i ++)
+     strip.setPixelColor(i, 64, 0, 128);
+    
+     
+     strip.show();   // 설정한 네오픽셀을 모두 점등
+     delay(1000);    // 1초간 대기
+}
+
+
+ 
